@@ -1,0 +1,74 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+<head>
+<meta charset="UTF-8">
+<title>ListPod App DJ Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h3 class="page-header">ListPod App DJ Dashboard</h3>
+    <div class="row">
+      <div class="col-md-6">
+        <a href="{% url 'app:myfavorites' %}">Your Favorite Feed</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="youtube user name">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button">his favorites</button>
+          </span>
+        </div>
+      </div>
+    </div>
+    {% if playlists %}
+    <div class="row">
+      <h4>Your Playlist Feeds</h4>
+      {% for playlist in playlists %}
+      <div class="col-md-3">
+        <div class="thumbnail">
+          <img src="{{ playlist.thumbnail }}" />
+          <div class="caption">
+            <h3>{{ playlist.title }}</h3>
+            <p>{{ playlist.description }}</p>
+            <p>
+              {% if playlist.playlist_id|slice:":2" == 'FL' %}
+                <a href="{% url 'app:myfavorites' %}" class="btn btn-primary" role="button">Feed</a>
+              {% else %}
+                <a href="{% url 'app:playlist' playlist_id=playlist.playlist_id %}" class="btn btn-primary" role="button">Feed</a>
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if subscriptions %}
+    <div class="row">
+      <h4>Your Subscription Feeds</h4>
+      {% for subscription in subscriptions %}
+      <div class="col-md-3">
+        <div class="thumbnail">
+          <img src="{{ subscription.thumbnail }}" />
+          <div class="caption">
+            <h3>{{ subscription.title }}</h3>
+            <p>{{ subscription.description }}</p>
+            <p><a href="{% url 'app:playlist' playlist_id=subscription.channel_id %}" class="btn btn-primary" role="button">Feed</a></p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>
+
