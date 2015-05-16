@@ -81,7 +81,7 @@ class Youtube(Client):
         return playlist_info
 
     def favorites(self, user_name=None):
-        favorites_playlist_id = self.channel()['relatedPlaylists']['favorites']
+        favorites_playlist_id = self.channel()['playlists']['favorites']
         return self.playlist(favorites_playlist_id)
 
     def channel(self, user_name=None):
