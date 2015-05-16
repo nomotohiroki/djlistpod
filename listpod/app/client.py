@@ -81,19 +81,28 @@ class Youtube(Client):
         return playlist_info
 
     def favorites(self, user_name=None):
-        if user_name:
-            response_channel = self.apiclient.channels().list(
-                part        = 'contentDetails',
-                forUsername = user_name,
-            ).execute()
-        else:
-            response_channel = self.apiclient.channels().list(
-                part        = 'contentDetails',
-                mine        = True,
-            ).execute()
-        
-        favorites_playlist_id = response_channel['items'][0]['contentDetails']['relatedPlaylists']['favorites']
+        favorites_playlist_id = self.channel()['relatedPlaylists']['favorites']
         return self.playlist(favorites_playlist_id)
+
+    def channel(self, user_name=None):
+        response_channel = self.apiclient.channels().list(
+            part        = 'snippet,contentDetails',
+            forUsername = user_name,
+            mine        = True  if user_name == None else False,
+        ).execute()['items'][0]
+        
+        related_playlists = response_channel['contentDetails']['relatedPlaylists']
+
+        return {
+            'title' : response_channel['snippet']['title'],
+            'thumbnail': response_channel['snippet']['thumbnails']['default']['url'],
+            'playlists': {
+                'likes'     : related_playlists['likes']      if related_playlists.has_key('likes')      else None,
+                'favorites' : related_playlists['favorites']  if related_playlists.has_key('favorites')  else None,
+                'uploads'   : related_playlists['uploads']    if related_playlists.has_key('uploads')    else None,
+                'watchLater': related_playlists['watchLater'] if related_playlists.has_key('watchLater') else None,
+            },
+        }
 
     def subscriptions(self, user_name=None, nextPageToken=None):
         response_subscriptions = self.apiclient.subscriptions().list(
@@ -136,7 +145,7 @@ class Youtube(Client):
                 'title':       item['snippet']['title'],
                 'description': item['snippet']['description'],
                 'timestamp':   datetime.strptime(item['snippet']['publishedAt'], '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=pytz.utc),
-                'thumbnail':   item['snippet']['thumbnails']['default']['url']
+                'thumbnail':   item['snippet']['thumbnails']['default']['url'] if item['snippet'].has_key('thumbnails') else ""
             })
         return playlist_videos
 
