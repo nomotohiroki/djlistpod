@@ -25,14 +25,15 @@ def rss_pubdate(datetime):
 
 def index(request):
     _init_ycl(request)
-    playlist_info = None
+    playlist_info     = None
     subscription_info = None
+    channel_info      = None
     if y != None and y.is_authorized():
-        playlist_info = y.playlists()
+        playlist_info     = y.playlists()
         subscription_info = y.subscriptions()
+        channel_info      = y.channel()
     
-    
-    return render_to_response('index.html', { 'playlists': playlist_info, 'subscriptions': subscription_info }, context_instance=RequestContext(request))
+    return render_to_response('dashboard.html', { 'channel': channel_info, 'playlists': playlist_info, 'subscriptions': subscription_info }, context_instance=RequestContext(request))
 
 def playlist(request, playlist_id):
     _init_ycl(request)
