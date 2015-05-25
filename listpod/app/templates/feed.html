@@ -1,0 +1,30 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+<head>
+<meta charset="UTF-8">
+<title>ListPod App DJ Playlist</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1 class="page-header">{{ title }}</h1>
+    {% for video in videos %}
+    <div class="media thumbnail">
+      <div class="media-left media-top">
+        <img class="media-object" src="{{ video.thumbnail }}"/>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="{{ video.url }}">{{ video.title }}</a></h3>
+        <p>
+          {{ video.description }}
+        </p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</body>
