@@ -12,13 +12,15 @@
 </head>
 <body>
   <div class="container">
-    <h3 class="page-header">ListPod App DJ Dashboard</h3>
+    <h1 class="page-header">ListPod App DJ Dashboard</h1>
+    {% if authorized %}
     <div class="row">
-      <h4>Your Farovite Feed</h4>
+      <h3>Your Farovite Feed</h3>
       <div class="col-md-6">
         <a href="{% url 'app:myfavorites' %}" class="btn btn-primary" role="button">Feed</a>
       </div>
     </div>
+    {% endif %}
     {% if channel and channel.playlists.watchLater %}
     <div class="row">
       <h4>Your WatchLater Feed</h4>
@@ -28,13 +30,10 @@
     </div>
     {% endif %}
     <div class="row">
-      <h4>Other users Favorites</h4>
+      <h4>Other users Feeds</h4>
       <div class="col-md-6">
         <div class="input-group">
           <input type="text" class="form-control" placeholder="youtube user name">
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="button">his favorites</button>
-          </span>
         </div>
       </div>
     </div>

@@ -16,12 +16,17 @@ class Client(object):
     
     SCOPE = None
     API_SERVICE_NAME = None
-    API_VERSION = None
+    API_VERSION      = None
+
+    API_KEY          = 'AIzaSyAqNEFzRIXBwDdO3PwZYKeoVBgkCOYBLOc'
+
     CLIENT_SECRETS   = os.path.join(os.path.dirname(__file__), 'client_secrets.json')
     CREDENTIALS_FILE = os.path.join(os.path.dirname(__file__), 'credential.json')
+
     _is_authorized = False
     
     def __init__(self, redirect_uri):
+        self.apiclient = build(self.API_SERVICE_NAME, self.API_VERSION, developerKey = self.API_KEY)
         self.flow = flow_from_clientsecrets(
             self.CLIENT_SECRETS,
             scope = self.SCOPE,
@@ -57,8 +62,8 @@ class Youtube(Client):
     SCOPE = "https://www.googleapis.com/auth/youtube"
     API_SERVICE_NAME = "youtube"
     API_VERSION = "v3"
-    _is_authorized = False
-
+    
+    VIDEO_BASE_URL = 'https://www.youtube.com/watch?v='
 
     def playlists(self, channel_id=None):
         response_playlists = self.apiclient.playlists().list(
@@ -81,10 +86,16 @@ class Youtube(Client):
         return playlist_info
 
     def favorites(self, user_name=None):
+        if not self.is_authorized() and user_name == None:
+            return None
+
         favorites_playlist_id = self.channel()['playlists']['favorites']
         return self.playlist(favorites_playlist_id)
 
     def channel(self, user_name=None):
+        if not self.is_authorized() and user_name == None:
+            return None
+        
         response_channel = self.apiclient.channels().list(
             part        = 'snippet,contentDetails',
             forUsername = user_name,
@@ -97,10 +108,10 @@ class Youtube(Client):
             'title' : response_channel['snippet']['title'],
             'thumbnail': response_channel['snippet']['thumbnails']['default']['url'],
             'playlists': {
-                'likes'     : related_playlists['likes']      if related_playlists.has_key('likes')      else None,
-                'favorites' : related_playlists['favorites']  if related_playlists.has_key('favorites')  else None,
-                'uploads'   : related_playlists['uploads']    if related_playlists.has_key('uploads')    else None,
-                'watchLater': related_playlists['watchLater'] if related_playlists.has_key('watchLater') else None,
+                'likes'     : related_playlists['likes']      if 'likes'      in related_playlists else None,
+                'favorites' : related_playlists['favorites']  if 'favorites'  in related_playlists else None,
+                'uploads'   : related_playlists['uploads']    if 'uploads'    in related_playlists else None,
+                'watchLater': related_playlists['watchLater'] if 'watchLater' in related_playlists else None,
             },
         }
 
@@ -142,10 +153,11 @@ class Youtube(Client):
         for item in response_playlistitems['items']:
             playlist_videos.append({
                 'video_id':    item['snippet']['resourceId']['videoId'],
+                'url':         self.VIDEO_BASE_URL + item['snippet']['resourceId']['videoId'],
                 'title':       item['snippet']['title'],
                 'description': item['snippet']['description'],
                 'timestamp':   datetime.strptime(item['snippet']['publishedAt'], '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=pytz.utc),
-                'thumbnail':   item['snippet']['thumbnails']['default']['url'] if item['snippet'].has_key('thumbnails') else ""
+                'thumbnail':   item['snippet']['thumbnails']['default']['url'] if 'thumbnails' in item['snippet'] else None
             })
         return playlist_videos
 
