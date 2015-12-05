@@ -1,4 +1,5 @@
 import calendar
+import logging
 from email import utils
 
 from django.shortcuts import redirect, render_to_response
@@ -17,6 +18,7 @@ ydl = None
 ie  = None
 y   = None
 
+logger = logging.getLogger('myapp')
 
 @register.filter(name='rss_pubdate')
 def rss_pubdate(datetime):
@@ -34,7 +36,7 @@ def index(request):
         channel_info      = y.channel()
     
     return render_to_response(
-        'dashboard.html',
+        "dashboard.html",
         {
             'authorized':    y.is_authorized(),
             'channel':       channel_info,
@@ -57,7 +59,9 @@ def favorites(request, user_name=None):
 def video(request, video_id):
     _init_ycl(request)
     o = ie.extract(video_id)
-    selected_url = ydl.select_format('best', o['formats'])['url']
+    # selected_url = ydl.select_format('best', o['formats'])['url']
+    format_selector = ydl.build_format_selector('best')
+    selected_url = list(format_selector(o['formats']))[0]['url']
     return redirect(selected_url)
 
 def oauth2callback(request):
